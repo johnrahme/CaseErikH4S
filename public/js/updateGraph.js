@@ -44,7 +44,8 @@ var options =  {
         yAxes: [{
             ticks: {
                 beginAtZero:true,
-                max: 70
+                max: 10,
+                min: 7
             }
 
         }]
@@ -89,10 +90,10 @@ var completeArray = [];
 //            { updateArray(completeArray,data, inc); }
 //        });
 
-
+var longLatArr  = [];
 function fetchData(callback) {
     var requests = [];
-    var longLatArr = [[58.376551, 13.247059, 807],
+     longLatArr = [[58.376551, 13.247059, 807],
         [65.267064, 17.223498, 756],
         [63.468186, 16.082271, 622],
         [63.480455, 15.063953, 616],
@@ -111,7 +112,7 @@ function fetchData(callback) {
         [59.566337, 19.877352, 61],
         [60.077216, 18.562342, 12],
         [57.086999, 15.272239, 8]];
-    for (var i = 1; i <= 10; i++) {
+    for (var i = 0; i <longLatArr.length; i++) {
         var lat = longLatArr[i][0];
         var long = longLatArr[i][1];
 
@@ -127,12 +128,15 @@ function fetchData(callback) {
     })
 }
 var test = "asd";
+var timeArr = [];
+var windArr = [];
+var usageArr = [];
 fetchData(function (array) {
 
-    alert(JSON.stringify(array[1].timeSeries[0].validTime))
+    //alert(JSON.stringify(array[1].timeSeries[0].validTime))
 
-    var windArr = [];
-    var timeArr = [];
+
+
     var min = array[0].timeSeries.length;
     for(var check = 1; check<array.length; check++){
         if(array[0].timeSeries.length<min){
@@ -143,36 +147,37 @@ fetchData(function (array) {
         timeArr.push(array[0].timeSeries[k].validTime);
         var tot = 0;
         for (var j = 0; j<array.length; j++){
-            tot += array[j].timeSeries[k].parameters[4].values[0];
+            tot += array[j].timeSeries[k].parameters[4].values[0]*longLatArr[j][2]/50000;
         }
-        windArr.push(Math.round(tot));
+        windArr.push(tot+8);
 
     }
     //alert(JSON.stringify(array[1].timeSeries[30].parameters[4].values[0]));
-    alert(JSON.stringify(windArr));
-    alert(JSON.stringify(timeArr));
+    //alert(JSON.stringify(windArr));
+    //alert(JSON.stringify(timeArr));
     myLiveChart.data.labels = timeArr;
     myLiveChart.data.datasets[0].data = windArr;
    // myLiveChart.data.datasets[1].data = windArr;
 
     $.getJSON( "js/varden.json", function( values ) {
-        alert(JSON.stringify(values));
+        //alert(JSON.stringify(values));
 
-        var usageArr = [];
+
         var startFrom = 14;
         var currTime = 1;
         for(var l = 0; l < timeArr.length; l++){
-            if(currTime == 24){
+            if(currTime == 25){
                 currTime = 1;
             }
-            var rounded = parseInt(values[startFrom+currTime].Avr);
+            var rounded = parseFloat(values[startFrom+currTime].Avr)/1000000;
             //var rounded = Math.round();
             usageArr.push(rounded);
             //alert(data[startFrom+currTime].Avr);
             currTime++;
         }
-        alert(JSON.stringify(usageArr));
+        //alert(JSON.stringify(usageArr));
         myLiveChart.data.datasets[1].data = usageArr;
+        //alert(JSON.stringify(rounded));
         myLiveChart.update();
     });
 
@@ -181,7 +186,26 @@ fetchData(function (array) {
 });
 
 
+//------------------------SLIDER---------------
+$( function() {
+    $( "#slider-range" ).slider({
+        range: true,
+        min: 0,
+        max: 71,
+        values: [ 0, 71],
+        slide: function( event, ui ) {
+            myLiveChart.data.labels = timeArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            myLiveChart.data.datasets[0].data = windArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            myLiveChart.data.datasets[1].data = usageArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            myLiveChart.update();
+            $( "#amount" ).val(timeArr[ui.values[ 0 ]] + " - " + timeArr[ui.values[ 1 ]]);
+        }
+    });
+} );
+//---------------------------------------------
 
+myLiveChart.data.labels = timeArr.slice(10,50);
 
+myLiveChart.update();
 
 

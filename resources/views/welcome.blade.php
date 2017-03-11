@@ -1,13 +1,30 @@
 @extends('layouts.default')
+@section('styles')
+    <link rel="stylesheet" href="js/jq/jquery-ui.min.css">
+    {{--<script src="js/jq/external/jquery/jquery.js"></script>--}}
+
+@endsection
 @section('content')
     {{--@include('drafts.welcome')--}}
-    {!! $page['content'] !!}
+{{--    {!! $page['content'] !!}--}}
 
-    <canvas id="myLiveChart" width="120" height="240"></canvas>
+
+        <p>
+        <label for="amount">Date range: </label>
+        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    </p>
+
+    <div id="slider-range"></div>
+
+
+    <canvas id="myLiveChart" width="120" height="300"></canvas>
+
 
 @endsection
 
 @section('scripts')
+    <script src="js/jq/jquery-ui.min.js"></script>
+
     <script src="{{asset('js/Chart.bundle.js')}}"></script>
 
     <script src = "{{asset('js/updateGraph.js')}}"></script>
