@@ -18,6 +18,8 @@ Route::get('/{lang}/edit', 'WelcomeController@edit')->middleware('auth');
 Route::post('/{lang}/update', 'WelcomeController@update')->middleware('auth');
 Route::post('/imgStore', 'WelcomeController@imgStore')->middleware('auth');
 
+
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');

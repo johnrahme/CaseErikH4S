@@ -54,11 +54,11 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'host' => 'mysql525.loopia.se',
-            'port' => '',
-            'database' => 'lottasgarveri_se',
-            'username' => 'admin@l161277',
-            'password' => '230192Mimmi!',
+            'host' => '50.87.144.31',
+            'port' => '3306',
+            'database' => 'johnrahm_h4s',
+            'username' => 'johnrahm_h4s',
+            'password' => '920123mimmi',
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix' => '',
