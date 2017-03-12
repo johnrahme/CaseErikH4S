@@ -40,8 +40,8 @@ var options =  {
         yAxes: [{
             ticks: {
                 beginAtZero:true,
-                max: 10,
-                min: 7
+                max: 21,
+                min: 10
             }
 
         }]
@@ -77,7 +77,7 @@ $( function() {
             //alert(timeArr.length);
             myLiveChart.update();
             $( "#from" ).html('From: '+timeArr[ui.values[ 0 ]]);
-            $( "#to" ).html('To: '+timeArr[ui.values[ 1 ]]);
+            $( "#to" ).html('To: '+timeArr[ui.values[ 1 ]-1]);
         }
     });
 } );
@@ -109,25 +109,25 @@ var completeArray = [];
 var longLatArr  = [];
 function fetchData(callback) {
     var requests = [];
-     longLatArr = [[58.376551, 13.247059, 807],
-        [65.267064, 17.223498, 756],
-        [63.468186, 16.082271, 622],
-        [63.480455, 15.063953, 616],
-        [55.833860, 13.212303, 608],
-        [61.030268, 16.553707, 484],
-        [56.928219, 12.715548, 472],
-        [57.002863, 16.411366, 392],
-        [67.169831, 22.044278, 388],
-        [61.384392, 15.256475, 273],
-        [57.616252, 14.533745, 266],
-        [58.392742, 14.976637, 171],
-        [59.385506, 13.749890, 171],
-        [57.078839, 18.236746, 171],
-        [56.126422, 14.642675, 69],
-        [59.001584, 15.368785, 68],
-        [59.566337, 19.877352, 61],
-        [60.077216, 18.562342, 12],
-        [57.086999, 15.272239, 8]];
+     longLatArr = [[58.376551, 13.247059, 807,554],
+        [65.267064, 17.223498, 756,333],
+        [63.468186, 16.082271, 622,226],
+        [63.480455, 15.063953, 616,254],
+        [55.833860, 13.212303, 608,430],
+        [61.030268, 16.553707, 484,174],
+        [56.928219, 12.715548, 472,260],
+        [57.002863, 16.411366, 392,202],
+        [67.169831, 22.044278, 388,162],
+        [61.384392, 15.256475, 273,131],
+        [57.616252, 14.533745, 266,126],
+        [58.392742, 14.976637, 171,142],
+        [59.385506, 13.749890, 171,61],
+        [57.078839, 18.236746, 171,126],
+        [56.126422, 14.642675, 69,51],
+        [59.001584, 15.368785, 68,45],
+        [59.566337, 19.877352, 61,26],
+        [60.077216, 18.562342, 12,13],
+        [57.086999, 15.272239, 8,8]];
     for (var i = 0; i <longLatArr.length; i++) {
         var lat = longLatArr[i][0];
         var long = longLatArr[i][1];
@@ -165,9 +165,32 @@ fetchData(function (array) {
         timeArr.push(str);
         var tot = 0;
         for (var j = 0; j<array.length; j++){
-            tot += array[j].timeSeries[k].parameters[4].values[0]*longLatArr[j][2]/50000;
+            //Using formula to calculate power from turbines
+            var wind = array[j].timeSeries[k].parameters[4].values[0];
+            //Biggest turbine
+            var area = Math.pow(70, 2)*Math.PI;
+            //Area realtive to maximum production
+            var accArea = area*longLatArr[j][3]/longLatArr[j][2];
+
+            var nrOfTurbines = longLatArr[j][3];
+
+            var eff = 0.4;
+
+            // total value power
+
+            var watt = 0.5*eff*accArea*Math.pow(wind,3) * nrOfTurbines;
+
+            // if(j == 0 && k == 0){
+            //     alert(wind);
+            //     alert(area);
+            //     alert(accArea);
+            //     alert(nrOfTurbines);
+            //     alert(watt);
+            // }
+            tot += watt/1000000000; //Convert to mega watt
         }
-        windArr.push(tot+8);
+        // add base power
+        windArr.push(tot+11);
 
     }
     //alert(JSON.stringify(array[1].timeSeries[30].parameters[4].values[0]));
@@ -181,17 +204,35 @@ fetchData(function (array) {
         //alert(JSON.stringify(values));
 
 
-        var startFrom = 14;
-        var currTime = 1;
+        var startFrom = 5; // what time does prognose start?
+        var currTime = startFrom;
+        var prevDate = "";
         for(var l = 0; l < timeArr.length; l++){
-            if(currTime == 25){
-                currTime = 1;
+            //Convert to date
+
+
+
+
+            var date = new Date(parseInt(timeArr[l].substring(0, 4)), parseInt(timeArr[l].substring(5, 7)), parseInt(timeArr[l].substring(8, 10)), parseInt(timeArr[l].substring(11, 13)), 0, 0, 0);
+
+            if(l != 0){
+                var timeDiff = Math.abs(prevDate.getTime() - date.getTime());
+                var diffHours = Math.ceil(timeDiff / (1000 * 3600));
             }
-            var rounded = parseFloat(values[startFrom+currTime].Avr)/1000000;
+            if(l == 13){
+
+                // alert(date.getFullYear());
+                // alert(date.getMonth());
+                // alert(date.getDate());
+                // alert(date.getHours());
+            }
+
+            var rounded = parseFloat(values[date.getHours()].Used)/1000;
             //var rounded = Math.round();
             usageArr.push(rounded);
             //alert(data[startFrom+currTime].Avr);
             currTime++;
+            prevDate = date;
         }
         //alert(JSON.stringify(usageArr));
         myLiveChart.data.datasets[1].data = usageArr;
