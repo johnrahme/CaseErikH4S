@@ -10,14 +10,16 @@
 
 
         <p>
-        <label for="amount">Date range: </label>
-        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+        <h4 id="from"></h4>
+    </p>
+    <p>
+        <h4 id="to"></h4>
     </p>
 
     <div id="slider-range"></div>
 
 
-    <canvas id="myLiveChart" width="120" height="300"></canvas>
+    <canvas id="myLiveChart" width="120" height="400"></canvas>
 
 
 @endsection

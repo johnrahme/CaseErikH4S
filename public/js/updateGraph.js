@@ -3,38 +3,34 @@
 
 var ctx = document.getElementById("myLiveChart");
 
-var values = [20];
-var values2 = [20];
-var lbls = [20];
+var values = [];
+var values2 = [];
+var lbls = [];
 
-for (var i = 0; i < 20; i++) {
-    values[i] = Math.sin(i)*10;
-    values2[i] =  -values[i]
-    lbls[i] = i;
-}
+
 
 var data = {
     labels: lbls,
     datasets: [{
-        label: '# of Votes',
+        label: 'Wind power estimation',
         data: values,
-        backgroundColor: [
+        backgroundColor:
             'rgba(255, 99, 132, 0.2)'
-        ],
-        borderColor: [
+        ,
+        borderColor:
             'rgba(255,99,132,1)'
-        ],
+        ,
         borderWidth: 1
     },
         {
-            label: 'Some other stuff',
+            label: 'Power usage',
             data: values2,
-            backgroundColor: [
+            backgroundColor:
                 'rgba(0, 200, 255, 0.2)'
-            ],
-            borderColor: [
+            ,
+            borderColor:
                 'rgba(0,200,255,1)'
-            ],
+            ,
             borderWidth: 1
         }]
 };
@@ -66,6 +62,26 @@ var myLiveChart = new Chart(ctx, {
 });
 
 //-------------------------------------------------
+
+//------------------------SLIDER---------------
+$( function() {
+    $( "#slider-range" ).slider({
+        range: true,
+        min: 0,
+        max: 0,
+        values: [ 0, 0],
+        slide: function( event, ui ) {
+            myLiveChart.data.labels = timeArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            myLiveChart.data.datasets[0].data = windArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            myLiveChart.data.datasets[1].data = usageArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
+            //alert(timeArr.length);
+            myLiveChart.update();
+            $( "#from" ).html('From: '+timeArr[ui.values[ 0 ]]);
+            $( "#to" ).html('To: '+timeArr[ui.values[ 1 ]]);
+        }
+    });
+} );
+//---------------------------------------------
 
 var call = 'http://opendata-download-metfcst.smhi.se/';
 
@@ -144,7 +160,9 @@ fetchData(function (array) {
         }
     }
     for(var k = 0; k<min; k++){
-        timeArr.push(array[0].timeSeries[k].validTime);
+       var str =  array[0].timeSeries[k].validTime;
+        str = str.substring(0, str.length - 1);
+        timeArr.push(str);
         var tot = 0;
         for (var j = 0; j<array.length; j++){
             tot += array[j].timeSeries[k].parameters[4].values[0]*longLatArr[j][2]/50000;
@@ -182,30 +200,18 @@ fetchData(function (array) {
     });
 
     myLiveChart.update();
+    // init min max on slider
+
+    $('#slider-range').slider( "option", "min", 0);
+    $('#slider-range').slider( "option", "max", timeArr.length-1);
+    $('#slider-range').slider( "option", "values", [0, timeArr.length-1]);
+    $( "#from" ).html('From: '+timeArr[0]);
+    $( "#to" ).html('To: '+timeArr[timeArr.length-1]);
 
 });
 
 
-//------------------------SLIDER---------------
-$( function() {
-    $( "#slider-range" ).slider({
-        range: true,
-        min: 0,
-        max: 71,
-        values: [ 0, 71],
-        slide: function( event, ui ) {
-            myLiveChart.data.labels = timeArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
-            myLiveChart.data.datasets[0].data = windArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
-            myLiveChart.data.datasets[1].data = usageArr.slice(ui.values[ 0 ],ui.values[ 1 ]);
-            myLiveChart.update();
-            $( "#amount" ).val(timeArr[ui.values[ 0 ]] + " - " + timeArr[ui.values[ 1 ]]);
-        }
-    });
-} );
-//---------------------------------------------
 
-myLiveChart.data.labels = timeArr.slice(10,50);
 
-myLiveChart.update();
 
 
