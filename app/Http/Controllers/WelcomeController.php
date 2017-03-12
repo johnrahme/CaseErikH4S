@@ -23,7 +23,7 @@ class WelcomeController extends Controller
         $welcome = Page::where('name', '=', 'welcome')->where('lang','=','se')->first();
 
 
-        return view('welcome', ['page' => $welcome, 'lang' => 'se']);
+        return view('welcome', ['page' => $welcome, 'lang' => 'se','active'=>'welcome']);
     }
     public function indexEn()
     {

@@ -14,8 +14,10 @@
 Route::get('/', 'WelcomeController@index');
 Route::get('/se', 'WelcomeController@index');
 Route::get('/en', 'WelcomeController@indexEn');
-Route::get('/{lang}/edit', 'WelcomeController@edit')->middleware('auth');
-Route::post('/{lang}/update', 'WelcomeController@update')->middleware('auth');
+Route::get('/data', 'DataController@index');
+Route::get('/contact', 'ContactController@index');
+//Route::get('/{lang}/edit', 'WelcomeController@edit')->middleware('auth');
+//Route::post('/{lang}/update', 'WelcomeController@update')->middleware('auth');
 Route::post('/imgStore', 'WelcomeController@imgStore')->middleware('auth');
 
 

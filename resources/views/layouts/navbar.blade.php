@@ -10,13 +10,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">H4S</a>
+            <a class="navbar-brand" href="#">Optigrid</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class = "active"><a href="#">Hem</a></li>
-                <li><a href="#">Grafer</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#myModal">Kontakt</a>
+                <li class = @if($active == 'welcome')"active"@endif><a href="{{url('/')}}">Hem</a></li>
+                <li class = @if($active == 'data')"active"@endif><a href="{{url('/data')}}">Data used</a></li>
+                <li class = @if($active == 'contact')"active"@endif><a href="{{url('/contact')}}" >Contact</a>
                     <!-- Button trigger modal --></li>
             </ul>
         </div><!--/.nav-collapse -->
