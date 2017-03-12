@@ -147,6 +147,7 @@ var test = "asd";
 var timeArr = [];
 var windArr = [];
 var usageArr = [];
+var dateArr = [];
 fetchData(function (array) {
 
     //alert(JSON.stringify(array[1].timeSeries[0].validTime))
@@ -159,13 +160,49 @@ fetchData(function (array) {
             min = array[0].timeSeries.length;
         }
     }
+    var prevDate2 = "";
+
+    var prevTot = 0;
     for(var k = 0; k<min; k++){
        var str =  array[0].timeSeries[k].validTime;
         str = str.substring(0, str.length - 1);
-        timeArr.push(str);
+
+
+
+
+        var date = new Date(parseInt(str.substring(0, 4)), parseInt(str.substring(5, 7))-1, parseInt(str.substring(8, 10)), parseInt(str.substring(11, 13)), 0, 0, 0);
+        //alert(str);
+
+        var timeDiff = "";
+        var diffHours = "";
+       // alert(k);
+        if(k != 0) {
+
+            // add extra hours on timeLabel
+            timeDiff = Math.abs(prevDate2.getTime() - date.getTime());
+            diffHours = Math.ceil(timeDiff / (1000 * 3600));
+            //alert(diffHours);
+            for (var n = 1; n < diffHours; n++) {
+                var newDate = new Date(prevDate2.getTime() + (1000 * 3600) * n);
+                dateArr.push(newDate.getTime());
+                timeArr.push(newDate.getFullYear()+'-'+date.getMonth()+'-'+date.getDate()+' '+date.getHours()+':00:00');
+            }
+
+        }
+        dateArr.push(date.getTime());
+        timeArr.push(date.getFullYear()+'-'+date.getMonth()+'-'+date.getDate()+' '+date.getHours()+':00:00');
+
+            // alert(date.getFullYear());
+            // alert(date.getMonth());
+            // alert(date.getDate());
+            // alert(date.getHours());
+            //timeArr.push()
+
         var tot = 0;
         for (var j = 0; j<array.length; j++){
             //Using formula to calculate power from turbines
+
+
             var wind = array[j].timeSeries[k].parameters[4].values[0];
             //Biggest turbine
             var area = Math.pow(70, 2)*Math.PI;
@@ -189,8 +226,19 @@ fetchData(function (array) {
             // }
             tot += watt/1000000000; //Convert to mega watt
         }
+        if(k != 1){
+            for (var n = 1; n < diffHours; n++) {
+                var add = (prevTot)+(tot-prevTot)*(n/(diffHours));
+                windArr.push(add+11);
+            }
+        }
+
         // add base power
         windArr.push(tot+11);
+
+
+        prevTot = tot;
+        prevDate2 = date;
 
     }
     //alert(JSON.stringify(array[1].timeSeries[30].parameters[4].values[0]));
@@ -213,12 +261,8 @@ fetchData(function (array) {
 
 
 
-            var date = new Date(parseInt(timeArr[l].substring(0, 4)), parseInt(timeArr[l].substring(5, 7)), parseInt(timeArr[l].substring(8, 10)), parseInt(timeArr[l].substring(11, 13)), 0, 0, 0);
-
-            if(l != 0){
-                var timeDiff = Math.abs(prevDate.getTime() - date.getTime());
-                var diffHours = Math.ceil(timeDiff / (1000 * 3600));
-            }
+            //var date = new Date(parseInt(timeArr[l].substring(0, 4)), parseInt(timeArr[l].substring(5, 7)), parseInt(timeArr[l].substring(8, 10)), parseInt(timeArr[l].substring(11, 13)), 0, 0, 0);
+            var date = new Date (dateArr[l]);
             if(l == 13){
 
                 // alert(date.getFullYear());
